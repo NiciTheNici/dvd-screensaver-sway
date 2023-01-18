@@ -2,17 +2,24 @@ use swayipc::{Connection, Fallible, Node};
 
 fn main() -> Fallible<()> {
     let mut ipc = Connection::new()?;
-    find_focused(&ipc.get_tree()?.nodes)?;
+    let focused_node = find_focused_node(ipc.get_tree()?.nodes);
+    println!("{:#?}", focused_node);
     Ok(())
 }
 
-fn find_focused(nodes: &Vec<Node>) -> Fallible<()> {
+fn find_focused_node(nodes: Vec<Node>) -> Fallible<Option<Node>> {
     for node in nodes {
         match node.focused {
-            true => println!("{}", node.name.as_ref().unwrap()),
+            true => {
+                println!("{}", node.name.as_ref().unwrap());
+                return Ok(Some(node));
+            }
             false => (),
         }
-        find_focused(&node.nodes)?;
+        match find_focused_node(node.nodes)? {
+            Some(r) => return Ok(Some(r)),
+            None => (),
+        };
     }
-    Ok(())
+    Ok(None)
 }
