@@ -17,7 +17,7 @@ fn main() -> Fallible<()> {
     loop {
         direction = get_next_direction(&mut ipc, direction)?;
         move_focused_window(&mut ipc, &direction);
-        thread::sleep(time::Duration::from_millis(10));
+        thread::sleep(time::Duration::from_millis(7));
     }
 }
 
