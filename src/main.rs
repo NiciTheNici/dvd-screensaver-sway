@@ -1,9 +1,13 @@
-use swayipc::{Connection, Fallible, Node, NodeType};
+use swayipc::{Connection, Error, Fallible, Node, NodeType};
 
 fn main() -> Fallible<()> {
     let mut ipc = Connection::new()?;
-    let focused_node = find_focused_node(ipc.get_tree()?.nodes, ipc.get_tree()?.floating_nodes);
-    println!("{:#?}", focused_node);
+    let focused_node =
+        find_focused_node(ipc.get_tree()?.nodes, ipc.get_tree()?.floating_nodes)?.unwrap();
+    println!("{:#?}", focused_node.node_type);
+    float_node(&mut ipc)?;
+    move_window(&mut ipc, Direction::NW);
+    println!("{:#?}", focused_node.node_type);
     Ok(())
 }
 
@@ -21,4 +25,36 @@ fn find_focused_node(nodes: Vec<Node>, floating_nodes: Vec<Node>) -> Fallible<Op
         };
     }
     Ok(None)
+}
+
+enum Direction {
+    NE,
+    ES,
+    SW,
+    NW,
+}
+
+fn move_window(ipc: &mut Connection, direction: Direction) {
+    match direction {
+        Direction::NE => {
+            _ = ipc.run_command(format!("move up {}", 1));
+            _ = ipc.run_command(format!("move right {}", 1));
+        }
+        Direction::ES => {
+            _ = ipc.run_command(format!("move up {}", -1));
+            _ = ipc.run_command(format!("move right {}", 1));
+        }
+        Direction::SW => {
+            _ = ipc.run_command(format!("move up {}", -1));
+            _ = ipc.run_command(format!("move right {}", -1));
+        }
+        Direction::NW => {
+            _ = ipc.run_command(format!("move up {}", 1));
+            _ = ipc.run_command(format!("move right {}", -1));
+        }
+    }
+}
+
+fn float_node(ipc: &mut Connection) -> Result<Vec<Result<(), Error>>, Error> {
+    ipc.run_command("floating on")
 }
