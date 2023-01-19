@@ -11,7 +11,7 @@ enum Direction {
 
 fn main() -> Fallible<()> {
     let mut ipc = Connection::new()?;
-    let mut direction = Direction::NW;
+    let mut direction = Direction::NE;
 
     ipc.run_command("floating on")?;
     loop {
