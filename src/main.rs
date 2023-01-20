@@ -1,5 +1,5 @@
 use std::{env, thread, time};
-use swayipc::{Connection, Error, Fallible, Node, NodeType};
+use swayipc::{Connection, Error, Fallible, Node, NodeType, Rect};
 
 #[derive(Debug, PartialEq)]
 enum Direction {
@@ -13,9 +13,10 @@ fn main() -> Fallible<()> {
     let mut ipc = Connection::new()?;
     let mut direction = Direction::NE;
 
+    let display_dimensions = ipc.get_tree()?.rect;
     ipc.run_command("floating on")?;
     loop {
-        direction = get_next_direction(&mut ipc, direction)?;
+        direction = get_next_direction(&mut ipc, direction, display_dimensions)?;
         move_focused_window(&mut ipc, &direction);
         thread::sleep(time::Duration::from_millis(get_speed_from_args()));
     }
@@ -50,7 +51,11 @@ fn find_focused_node(nodes: Vec<Node>, floating_nodes: Vec<Node>) -> Fallible<Op
     Ok(None)
 }
 
-fn get_next_direction(ipc: &mut Connection, old_direction: Direction) -> Fallible<Direction> {
+fn get_next_direction(
+    ipc: &mut Connection,
+    old_direction: Direction,
+    display_dimensions: Rect,
+) -> Fallible<Direction> {
     let focused_node: Node =
         match find_focused_node(ipc.get_tree()?.nodes, ipc.get_tree()?.floating_nodes)? {
             Some(r) => r,
@@ -60,7 +65,6 @@ fn get_next_direction(ipc: &mut Connection, old_direction: Direction) -> Fallibl
                 ))
             }
         };
-    let display_dimensions = ipc.get_tree()?.rect;
 
     match old_direction {
         Direction::NE => {
