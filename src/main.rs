@@ -1,4 +1,4 @@
-use std::{thread, time};
+use std::{env, thread, time};
 use swayipc::{Connection, Error, Fallible, Node, NodeType};
 
 #[derive(Debug, PartialEq)]
@@ -17,8 +17,21 @@ fn main() -> Fallible<()> {
     loop {
         direction = get_next_direction(&mut ipc, direction)?;
         move_focused_window(&mut ipc, &direction);
-        thread::sleep(time::Duration::from_millis(7));
+        thread::sleep(time::Duration::from_millis(get_speed_from_args()));
     }
+}
+
+fn get_speed_from_args() -> u64 {
+    let args: Vec<String> = env::args().collect();
+    let mut speed: u64 = 7;
+    match args.len() {
+        2.. => match args[1].parse::<u64>() {
+            Ok(r) => speed = r,
+            Err(_) => {}
+        },
+        _ => (),
+    };
+    speed
 }
 
 fn find_focused_node(nodes: Vec<Node>, floating_nodes: Vec<Node>) -> Fallible<Option<Node>> {
