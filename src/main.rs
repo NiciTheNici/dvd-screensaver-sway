@@ -65,40 +65,56 @@ fn get_next_direction(
                 ))
             }
         };
+    println!("{:?}", old_direction);
+    println!("{:?}", focused_node.rect);
+    println!("{:?}", display_dimensions);
+    println!(
+        "{}, {}",
+        focused_node.rect.x - display_dimensions.x,
+        focused_node.rect.y - display_dimensions.y
+    );
 
     match old_direction {
         Direction::NE => {
-            if focused_node.rect.x + focused_node.rect.width >= display_dimensions.width {
+            if focused_node.rect.x + focused_node.rect.width - display_dimensions.x
+                > display_dimensions.width
+            {
                 return Ok(Direction::NW);
             }
-            if focused_node.rect.y <= 0 {
+            if focused_node.rect.y < display_dimensions.y {
                 return Ok(Direction::SE);
             }
         }
 
         Direction::SE => {
-            if focused_node.rect.x + focused_node.rect.width >= display_dimensions.width {
+            if focused_node.rect.x + focused_node.rect.width - display_dimensions.x
+                > display_dimensions.width
+            {
                 return Ok(Direction::SW);
             }
-            if focused_node.rect.y + focused_node.rect.height >= display_dimensions.height {
+            if focused_node.rect.y + focused_node.rect.height - display_dimensions.y
+                > display_dimensions.height
+            {
                 return Ok(Direction::NE);
             }
         }
 
         Direction::SW => {
-            if focused_node.rect.x <= 0 {
+            if focused_node.rect.x < display_dimensions.x {
                 return Ok(Direction::SE);
             }
-            if focused_node.rect.y + focused_node.rect.height >= display_dimensions.height {
+            if focused_node.rect.y + focused_node.rect.height - display_dimensions.height
+                > display_dimensions.y
+            {
                 return Ok(Direction::NW);
             }
         }
 
         Direction::NW => {
-            if focused_node.rect.x <= 0 {
+            if focused_node.rect.x <= display_dimensions.x {
                 return Ok(Direction::NE);
             }
-            if focused_node.rect.y <= 0 {
+            if focused_node.rect.y <= display_dimensions.y {
                 return Ok(Direction::SW);
             }
         }
