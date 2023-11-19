@@ -65,14 +65,6 @@ fn get_next_direction(
                 ))
             }
         };
-    println!("{:?}", old_direction);
-    println!("{:?}", focused_node.rect);
-    println!("{:?}", display_dimensions);
-    println!(
-        "{}, {}",
-        focused_node.rect.x - display_dimensions.x,
-        focused_node.rect.y - display_dimensions.y
-    );
 
     match old_direction {
         Direction::NE => {
